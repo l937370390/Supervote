@@ -1,0 +1,6 @@
+{
+  "name": "Reaction Loop",
+  "description": "移动端优先的 AI 产品反馈测试工具，用来帮助创业者、产品经理和研究者快速验证产品概念、功能或用户偏好。通过手势右滑(喜欢)、左滑(跳过)及 Supervote 收集信号，并生成 AI 用户研究洞察与个性卡片。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
