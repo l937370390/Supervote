@@ -29,6 +29,170 @@ import {
 } from "lucide-react";
 import { ConceptCard, FeedbackSignal, RespondentSession } from "./types";
 
+const DEMO_CONCEPTS: ConceptCard[] = [
+  {
+    id: "concept-1",
+    title: "AI Onboarding Copilot",
+    description: "A setup assistant that interviews new users, detects missing context, and turns answers into a usable product profile.",
+    category: "Activation",
+    type: "single",
+    followUpMode: "default",
+    followUpDwellThresholdMs: 4
+  },
+  {
+    id: "concept-2",
+    title: "Supervote Pricing Signal",
+    description: "Let users spend one scarce star on the concept they would actually prioritize, not just casually like.",
+    category: "Preference",
+    type: "single",
+    followUpMode: "force",
+    followUpDwellThresholdMs: 4
+  },
+  {
+    id: "concept-compare-1",
+    title: "Feedback Collection Mode",
+    description: "Compare two product research flows and drag the star onto the stronger direction.",
+    category: "Comparison",
+    type: "compare",
+    optionA: {
+      title: "Fast Swipe Test",
+      description: "Collect quick like/pass reactions and dwell-time signals from mobile respondents."
+    },
+    optionB: {
+      title: "Structured Survey",
+      description: "Ask detailed questions up front and collect longer written answers."
+    },
+    followUpMode: "conditional",
+    followUpDwellThresholdMs: 3
+  },
+  {
+    id: "concept-3",
+    title: "Persona Recap Card",
+    description: "Reward respondents with a shareable feedback personality card after the test is complete.",
+    category: "Reward Loop",
+    type: "single",
+    followUpMode: "never",
+    followUpDwellThresholdMs: 4
+  }
+];
+
+const DEMO_ANALYTICS = {
+  totalRespondents: 42,
+  conceptAnalytics: [
+    {
+      id: "concept-1",
+      title: "AI Onboarding Copilot",
+      type: "single",
+      likes: 24,
+      passes: 8,
+      supervotes: 10,
+      avgDwellTimeSeconds: 6.2,
+      confirmedReasons: [
+        { reason: "Reduces setup friction", count: 18 },
+        { reason: "Feels immediately useful", count: 13 },
+        { reason: "Clearer value", count: 9 }
+      ]
+    },
+    {
+      id: "concept-2",
+      title: "Supervote Pricing Signal",
+      type: "single",
+      likes: 18,
+      passes: 6,
+      supervotes: 18,
+      avgDwellTimeSeconds: 8.4,
+      confirmedReasons: [
+        { reason: "Shows real priority", count: 16 },
+        { reason: "Worth paying for", count: 12 },
+        { reason: "Better than survey ratings", count: 8 }
+      ]
+    },
+    {
+      id: "concept-compare-1",
+      title: "Feedback Collection Mode",
+      type: "compare",
+      optionA: DEMO_CONCEPTS[2].optionA,
+      optionB: DEMO_CONCEPTS[2].optionB,
+      compareACount: 19,
+      compareBCount: 8,
+      compareSuperACount: 11,
+      compareSuperBCount: 4,
+      avgDwellTimeSeconds: 7.1,
+      confirmedReasons: [
+        { reason: "Faster to complete", count: 17 },
+        { reason: "Feels more natural", count: 14 },
+        { reason: "Less survey fatigue", count: 9 }
+      ]
+    },
+    {
+      id: "concept-3",
+      title: "Persona Recap Card",
+      type: "single",
+      likes: 21,
+      passes: 12,
+      supervotes: 9,
+      avgDwellTimeSeconds: 5.7,
+      confirmedReasons: [
+        { reason: "Makes completion rewarding", count: 15 },
+        { reason: "Shareable artifact", count: 10 },
+        { reason: "Fun but not required", count: 7 }
+      ]
+    }
+  ],
+  demographics: {
+    roles: ["Founders", "Product managers", "Researchers", "Designers"]
+  },
+  sessions: [
+    {
+      id: "demo-session-1",
+      selfDescription: "I am a solo founder testing AI workflow tools. I use ChatGPT daily and decide which tools to buy.",
+      profile: {
+        role: "Solo founder",
+        aiUsage: "Daily",
+        purchaseRole: "Decision maker",
+        market: "North America",
+        companySize: "1-10 people"
+      },
+      signals: [],
+      personalityName: "The High-Signal Pragmatist",
+      personalityDesc: "You move quickly, but your strongest preferences are practical and purchase-oriented.",
+      createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString()
+    },
+    {
+      id: "demo-session-2",
+      selfDescription: "Product manager at a B2B SaaS company. I evaluate research tools and run user interviews every month.",
+      profile: {
+        role: "Product Manager",
+        aiUsage: "Weekly",
+        purchaseRole: "Evaluator",
+        market: "Europe",
+        companySize: "51-200 people"
+      },
+      signals: [],
+      personalityName: "The Insight Curator",
+      personalityDesc: "You prefer tools that turn messy reactions into readable decision evidence.",
+      createdAt: new Date(Date.now() - 1000 * 60 * 90).toISOString()
+    }
+  ],
+  aiInsights: [
+    "Supervote is the strongest signal: users reserve it for concepts that imply purchase intent or clear workflow priority.",
+    "Swipe-first testing reduces completion friction for early concept validation, especially on mobile.",
+    "Reason confirmation bubbles produce cleaner qualitative evidence than asking every respondent to write from scratch.",
+    "Comparison cards should be used when teams need a directional product decision rather than simple concept validation."
+  ]
+};
+
+function inferDemoProfile(selfDescription: string) {
+  const text = selfDescription.toLowerCase();
+  return {
+    role: text.includes("founder") ? "Solo founder" : text.includes("manager") || text.includes("pm") ? "Product Manager" : text.includes("research") ? "Researcher" : "Product builder",
+    aiUsage: text.includes("daily") ? "Daily" : text.includes("rare") ? "Rarely" : "Weekly",
+    purchaseRole: text.includes("decide") || text.includes("buy") || text.includes("founder") ? "Decision maker" : "Evaluator",
+    market: text.includes("china") ? "China" : text.includes("europe") ? "Europe" : "North America",
+    companySize: text.includes("solo") || text.includes("founder") ? "1-10 people" : text.includes("enterprise") ? "1000+ people" : "11-50 people"
+  };
+}
+
 export default function App() {
   // Navigation State: 'respondent' | 'researcher'
   const [appMode, setAppMode] = useState<'respondent' | 'researcher'>('respondent');
@@ -48,9 +212,9 @@ export default function App() {
     aiEngineStatus?: 'active' | 'suspended' | 'offline';
     forceSandbox?: boolean;
   }>({
-    name: "Reaction Loop Tech Probe",
-    description: "移动端优先的 AI 产品反馈测试工具。此套件自动捕捉用户偏好、停留用时、超投票等隐形信号。",
-    concepts: [],
+    name: "Supervote",
+    description: "A lighter way to turn product reactions into user research signals.",
+    concepts: DEMO_CONCEPTS,
     targetProfileFields: ["market", "companySize"],
     aiEngineStatus: 'active',
     forceSandbox: false
@@ -62,10 +226,23 @@ export default function App() {
       const res = await fetch("/api/project");
       const data = await res.json();
       if (data && data.concepts) {
-        setProject(data);
+        setProject({
+          ...data,
+          name: data.name || "Supervote",
+          description: data.description || "A lighter way to turn product reactions into user research signals.",
+          concepts: data.concepts.length > 0 ? data.concepts : DEMO_CONCEPTS
+        });
       }
     } catch (e) {
       console.error("Failed to load project design configurations", e);
+      setProject(prev => ({
+        ...prev,
+        name: "Supervote",
+        description: "A lighter way to turn product reactions into user research signals.",
+        concepts: DEMO_CONCEPTS,
+        aiEngineStatus: 'offline',
+        forceSandbox: true
+      }));
     }
   };
 
@@ -177,9 +354,10 @@ export default function App() {
     try {
       const res = await fetch("/api/analytics");
       const data = await res.json();
-      setAnalyticsData(data);
+      setAnalyticsData(data && data.conceptAnalytics ? data : DEMO_ANALYTICS);
     } catch (e) {
       console.error("Failed to load survey analytics dataset", e);
+      setAnalyticsData(DEMO_ANALYTICS);
     } finally {
       setIsAnalyticsLoading(false);
     }
@@ -526,12 +704,14 @@ export default function App() {
             personalityDesc: data.session.personalityDesc,
             session: data.session
           });
+        } else {
+          throw new Error("No generated session returned");
         }
       } catch (e) {
         console.error("Failed report submission", e);
         setGeneratedPersona({
-          personalityName: "The Direct Pragmatist",
-          personalityDesc: "Your swiping pattern represents highly decisive standards. You chose verified targets rapidly, optimizing your cognitive workflow with extreme focus."
+          personalityName: "The High-Signal Pragmatist",
+          personalityDesc: "You react quickly, but your strongest preferences cluster around products that reduce research friction and create clearer decision evidence."
         });
       } finally {
         setSurveyStep('reportDetails');
@@ -559,9 +739,12 @@ export default function App() {
           market: p.market !== "Unknown" ? p.market : "",
           companySize: p.companySize !== "Unknown" ? p.companySize : ""
         });
+      } else {
+        setProfile(inferDemoProfile(selfDesc));
       }
     } catch (e) {
       console.error("Self desc extraction error, resetting fallback fields", e);
+      setProfile(inferDemoProfile(selfDesc));
     } finally {
       setIsExtracting(false);
       setSurveyStep('confirmProfile');
@@ -787,7 +970,7 @@ export default function App() {
             </button>
           )}
           <span className="font-mono text-xs text-secondary border border-outline-variant rounded px-2 py-0.5 bg-white uppercase tracking-widest hidden sm:block">
-            {appMode === 'respondent' ? "Interactive Portal" : "Researcher Portal [DEVEL]"}
+            {appMode === 'respondent' ? "Respondent Demo" : "Researcher Dashboard"}
           </span>
           {project.aiEngineStatus && (
             <div 
@@ -820,7 +1003,7 @@ export default function App() {
 
         {/* System Title */}
         <h1 className="font-sans text-xs font-bold uppercase tracking-widest absolute left-1/2 -translate-x-1/2 text-black select-none pointer-events-none">
-          REACTION LOOP
+          SUPERVOTE
         </h1>
 
         {/* Global toggling switch between Respondent Testing Simulator & Researcher Analytics Dashboard */}
@@ -859,48 +1042,73 @@ export default function App() {
             
             {/* Step: Welcome Landing */}
             {surveyStep === 'welcome' && (
-              <div className="w-full flex-1 flex flex-col justify-between items-center py-6 animate-fade-in text-center">
-                
-                {/* Dialogue Bubble speaking to User */}
-                <div className="relative w-full bg-white border border-black rounded-2xl p-6 stacked-card mb-8 text-center max-w-sm">
-                  <p className="font-serif text-lg leading-relaxed text-black">
-                    "A product idea is waiting for your first reaction."
-                  </p>
-                  
-                  {/* Speech Bubble Arrow - custom pen-sketch vector */}
-                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2">
-                    <svg className="w-8 h-8 text-black fill-none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24">
-                      <path d="M12 2C12 2 12 18 12 22C12 22 10 18 8 16"></path>
-                      <path d="M12 2C12 2 12 18 12 22C12 22 14 18 16 16"></path>
-                    </svg>
+              <div className="w-full flex-1 flex flex-col justify-between py-5 animate-fade-in text-center">
+                <div className="space-y-5">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-black text-[10px] font-mono font-bold uppercase tracking-widest shadow-[2px_2px_0px_#000000]">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Mobile AI Research Demo
+                  </div>
+
+                  <div className="space-y-3">
+                    <h2 className="text-4xl font-extrabold tracking-tight text-black leading-none">
+                      Supervote
+                    </h2>
+                    <p className="font-serif text-[18px] leading-relaxed text-slate-800 max-w-sm mx-auto">
+                      A lighter way to turn product reactions into user research signals.
+                    </p>
+                  </div>
+
+                  <div className="relative mx-auto w-full max-w-[330px] bg-white border-2 border-black rounded-[28px] p-4 shadow-[7px_7px_0px_#000000] text-left overflow-hidden">
+                    <div className="flex items-center justify-between border-b border-dashed border-[#cfc4c5] pb-3 mb-4">
+                      <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-slate-500">Live test card</span>
+                      <span className="px-2 py-0.5 rounded-full bg-amber-50 border border-amber-300 text-amber-700 text-[10px] font-mono font-bold">★ Supervote</span>
+                    </div>
+                    <div className="bg-[#f9f9f8] border border-black rounded-2xl p-5 min-h-[210px] flex flex-col justify-between">
+                      <div>
+                        <span className="font-mono text-[10px] uppercase tracking-widest text-slate-400 font-bold">Concept</span>
+                        <h3 className="text-2xl font-extrabold leading-tight mt-2 mb-3">AI Onboarding Copilot</h3>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          Swipe right to like, left to pass, or spend one scarce star when the idea feels truly important.
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 mt-5 text-center font-mono text-[10px] uppercase font-bold">
+                        <span className="border border-black rounded-lg py-2 bg-white">Pass</span>
+                        <span className="border border-black rounded-lg py-2 bg-black text-white">★</span>
+                        <span className="border border-black rounded-lg py-2 bg-white">Like</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 text-left">
+                    {[
+                      ["Profile", "AI extracts respondent context from one sentence."],
+                      ["Signal", "Swipe, dwell time, stars, and reasons are captured."],
+                      ["Insight", "Researchers see segments, scores, and AI recommendations."]
+                    ].map(([title, body]) => (
+                      <div key={title} className="bg-white border border-outline-variant rounded-xl p-3 min-h-[92px]">
+                        <h3 className="font-mono text-[10px] font-bold uppercase tracking-wider text-black mb-1">{title}</h3>
+                        <p className="text-[11px] leading-snug text-slate-500">{body}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Fluffy Soot Mascot Doodle */}
-                <div className="my-6 float-animation">
-                  <img 
-                    alt="Cute fluffy black soot sprite mascot doodle character with huge round curious eyes" 
-                    className="w-32 h-32 md:w-36 md:h-36 object-contain mix-blend-multiply drop-shadow" 
-                    src="https://lh3.googleusercontent.com/aida/AP1WRLuSOVbr3IeEQSL_B6776x4yyQGZxGDXS_I6OKyxjULha4V85jtKKZCLGl0Cl-O-WMcyOgiPPgt6XiZtOG5xcHpNpTiawR-606CkWLuTfDdTCgtSi7YWfgD4zGoRuXwznsAA1FXS7ntRIljYEQ5s_-_NlHV6vY6s9tQBqLyhAiV5WgjmiMtPAI0xJIV1pJp7V7p2Fj8ojpyZtNQOFyuPhx2TJ6fy5dPiqeo6GnjOPej1zHPOfeUOIPABE_0" 
-                    referrerPolicy="no-referrer"
-                  />
+                <div className="w-full space-y-3 pt-6">
+                  <button
+                    onClick={() => setSurveyStep('selfDescription')}
+                    className="w-full bg-black text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 hover:bg-neutral-800 transition-all cursor-pointer active:translate-y-0.5 shadow-[0_4px_0_0_#dadad9] active:shadow-none"
+                  >
+                    <Play className="w-5 h-5 text-white fill-white" />
+                    <span>Try respondent demo</span>
+                  </button>
+                  <button
+                    onClick={() => setAppMode('researcher')}
+                    className="w-full bg-white text-black border border-black font-bold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2 hover:bg-[#eeeeed] transition-all cursor-pointer active:translate-y-0.5 shadow-[0_3px_0_0_#000000] active:shadow-none"
+                  >
+                    <TrendingUp className="w-4 h-4" />
+                    <span>View researcher dashboard</span>
+                  </button>
                 </div>
-
-                {/* Mini instructions details */}
-                <div className="max-w-xs mb-10">
-                  <p className="text-secondary text-sm">
-                    About 2 minutes. Tap choices or physically swipe cards. You'll get a beautiful feedback personality card at the end.
-                  </p>
-                </div>
-
-                {/* Large action CTA bottom */}
-                <button 
-                  onClick={() => setSurveyStep('selfDescription')}
-                  className="w-full bg-black text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 hover:bg-neutral-800 transition-all cursor-pointer active:translate-y-0.5 shadow-[0_4px_0_0_#dadad9] active:shadow-none"
-                >
-                  <span>Start test</span>
-                  <ArrowRight className="w-5 h-5 text-white" />
-                </button>
               </div>
             )}
 
@@ -948,6 +1156,13 @@ export default function App() {
                     </span>
                     <span>{selfDesc.length} / 180</span>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelfDesc("I am a solo founder. I use ChatGPT daily and decide which AI tools my team should buy.")}
+                    className="mt-4 w-full border border-dashed border-black rounded-xl py-2.5 text-xs font-bold text-black bg-[#f9f9f8] hover:bg-[#eeeeed] transition-colors"
+                  >
+                    Use demo respondent
+                  </button>
                 </div>
 
                 {/* Bottom Extraction submit button */}
