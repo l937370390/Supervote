@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Supervote Demo</title>
+    <meta
+      name="description"
+      content="Supervote is a mobile-first AI feedback testing demo that turns product reactions into research signals."
+    />
+    <style>
+      :root {
+        --ink: #111111;
+        --paper: #f7f4ee;
+        --card: #ffffff;
+        --muted: #68635d;
+        --line: #111111;
+        --accent: #f5b342;
+        --green: #28a56a;
+        --red: #e84c4f;
+        --blue: #4967d8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 10% 20%, rgba(245, 179, 66, 0.16), transparent 26rem),
+          radial-gradient(circle at 90% 10%, rgba(73, 103, 216, 0.12), transparent 24rem),
+          linear-gradient(135deg, #fbfaf7, var(--paper));
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .shell {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 22px 0 34px;
+      }
+
+      header {
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.84);
+        padding: 0 16px;
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .mark {
+        width: 30px;
+        height: 30px;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--ink);
+        border-radius: 10px;
+        background: var(--ink);
+        color: white;
+      }
+
+      nav {
+        display: flex;
+        gap: 8px;
+      }
+
+      .nav-btn,
+      .primary,
+      .secondary,
+      .choice {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: white;
+        color: var(--ink);
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      }
+
+      .nav-btn {
+        padding: 9px 12px;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .nav-btn.active,
+      .primary {
+        background: var(--ink);
+        color: white;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.8fr);
+        gap: 28px;
+        align-items: center;
+        padding: 46px 0 30px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 7px 11px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: white;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 18px 0 16px;
+        max-width: 780px;
+        font-size: clamp(42px, 7vw, 88px);
+        line-height: 0.92;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        max-width: 700px;
+        margin: 0;
+        color: #3b3732;
+        font-size: clamp(18px, 2.3vw, 24px);
+        line-height: 1.35;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 26px;
+      }
+
+      .primary,
+      .secondary {
+        padding: 14px 18px;
+        font-weight: 900;
+        box-shadow: 3px 3px 0 var(--ink);
+      }
+
+      .primary:active,
+      .secondary:active,
+      .choice:active,
+      .nav-btn:active {
+        transform: translate(2px, 2px);
+        box-shadow: none;
+      }
+
+      .hero-points {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .point {
+        min-height: 112px;
+        border: 1px solid #d8d1c5;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.72);
+        padding: 14px;
+      }
+
+      .point strong {
+        display: block;
+        margin-bottom: 7px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .point span {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      .phone {
+        width: min(390px, 100%);
+        margin-left: auto;
+        border: 2px solid var(--ink);
+        border-radius: 36px;
+        background: #0f0f0f;
+        padding: 12px;
+        box-shadow: 10px 10px 0 var(--ink);
+      }
+
+      .screen {
+        min-height: 650px;
+        overflow: hidden;
+        border-radius: 26px;
+        background: #fbfaf7;
+        padding: 18px;
+      }
+
+      .screen-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: white;
+        padding: 5px 9px;
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .card {
+        min-height: 340px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 2px solid var(--line);
+        border-radius: 24px;
+        background: white;
+        padding: 22px;
+        box-shadow: 5px 5px 0 var(--ink);
+      }
+
+      .tag {
+        align-self: flex-start;
+        border: 1px dashed #b9afa2;
+        border-radius: 999px;
+        padding: 5px 9px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .card h2 {
+        margin: 22px 0 12px;
+        font-size: 30px;
+        line-height: 1;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.45;
+      }
+
+      .signal-row {
+        display: grid;
+        grid-template-columns: 1fr 58px 1fr;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .choice {
+        height: 54px;
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+        box-shadow: 2px 2px 0 var(--ink);
+      }
+
+      .star {
+        background: var(--ink);
+        color: white;
+        font-size: 21px;
+      }
+
+      .reason-panel,
+      .persona,
+      .dashboard {
+        display: none;
+      }
+
+      .reason-panel.show,
+      .persona.show,
+      .dashboard.show {
+        display: block;
+      }
+
+      .reason-panel {
+        margin-top: 16px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: white;
+        padding: 16px;
+      }
+
+      .reason-panel h3,
+      .persona h3,
+      .dashboard h3 {
+        margin: 0 0 12px;
+        font-size: 16px;
+      }
+
+      .reasons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .reason {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #fff7e3;
+        padding: 8px 10px;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .persona {
+        margin-top: 16px;
+        border: 2px solid var(--line);
+        border-radius: 22px;
+        background: white;
+        padding: 18px;
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+
+      .persona-title {
+        margin: 8px 0;
+        font-size: 24px;
+        line-height: 1.05;
+        font-weight: 950;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 26px 0;
+      }
+
+      .metric,
+      .insight,
+      .bar-card {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: white;
+        padding: 16px;
+      }
+
+      .metric b {
+        display: block;
+        font-size: 34px;
+      }
+
+      .metric span {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 0.85fr 1.15fr;
+        gap: 16px;
+      }
+
+      .insight {
+        margin-bottom: 12px;
+        line-height: 1.45;
+      }
+
+      .bar-card {
+        margin-bottom: 12px;
+      }
+
+      .bar-label {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .bar {
+        height: 13px;
+        overflow: hidden;
+        border: 1px solid #d8d1c5;
+        border-radius: 999px;
+        background: #e9e1d7;
+      }
+
+      .fill {
+        height: 100%;
+        border-radius: 999px;
+        background: var(--ink);
+      }
+
+      footer {
+        margin-top: 28px;
+        color: var(--muted);
+        font-size: 13px;
+        text-align: center;
+      }
+
+      @media (max-width: 860px) {
+        .hero {
+          grid-template-columns: 1fr;
+          padding-top: 28px;
+        }
+
+        .phone {
+          margin: 8px auto 0;
+        }
+
+        .hero-points,
+        .metrics,
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+        }
+
+        header {
+          height: auto;
+          align-items: flex-start;
+          gap: 12px;
+          flex-direction: column;
+          padding: 14px;
+        }
+
+        nav {
+          width: 100%;
+        }
+
+        .nav-btn {
+          flex: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <div class="brand"><span class="mark">★</span> Supervote</div>
+        <nav aria-label="Demo views">
+          <button class="nav-btn active" data-view="respondent">Respondent</button>
+          <button class="nav-btn" data-view="researcher">Researcher</button>
+        </nav>
+      </header>
+
+      <section class="hero" id="respondentView">
+        <div>
+          <span class="eyebrow">Mobile-first AI research demo</span>
+          <h1>Turn product reactions into research signals.</h1>
+          <p class="lead">
+            Supervote helps founders, product managers, and researchers test product concepts with swipe-first feedback,
+            scarce star votes, AI reason confirmation, and instant insight summaries.
+          </p>
+          <div class="actions">
+            <button class="primary" id="startDemo">Try the 30-second demo</button>
+            <button class="secondary" id="showResearcher">Open researcher view</button>
+          </div>
+          <div class="hero-points">
+            <div class="point"><strong>Profile</strong><span>One sentence becomes lightweight respondent attributes.</span></div>
+            <div class="point"><strong>Signal</strong><span>Swipe direction, dwell time, stars, and confirmed reasons are captured.</span></div>
+            <div class="point"><strong>Insight</strong><span>Researchers get ratios, strong preference, segments, and AI recommendations.</span></div>
+          </div>
+        </div>
+
+        <div class="phone" aria-label="Interactive mobile demo">
+          <div class="screen">
+            <div class="screen-top">
+              <span>Respondent test</span>
+              <span class="pill">★ <span id="starsLeft">1</span> left</span>
+            </div>
+            <div class="card" id="conceptCard">
+              <span class="tag" id="cardTag">Activation</span>
+              <div>
+                <h2 id="cardTitle">AI Onboarding Copilot</h2>
+                <p id="cardText">Interview new users, detect missing context, and turn answers into a usable product profile.</p>
+              </div>
+              <span class="pill" id="signalHint">Waiting for first reaction</span>
+            </div>
+
+            <div class="signal-row">
+              <button class="choice" data-choice="pass">Pass</button>
+              <button class="choice star" data-choice="supervote">★</button>
+              <button class="choice" data-choice="like">Like</button>
+            </div>
+
+            <div class="reason-panel" id="reasonPanel">
+              <h3>AI suggests reasons. User confirms.</h3>
+              <div class="reasons" id="reasons"></div>
+            </div>
+
+            <div class="persona" id="persona">
+              <span class="pill">Feedback persona card</span>
+              <div class="persona-title">The High-Signal Pragmatist</div>
+              <p>
+                You react quickly, but your strongest preferences cluster around tools that reduce research friction and
+                create clearer decision evidence.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard" id="researcherView">
+        <div class="metrics">
+          <div class="metric"><b>42</b><span>respondents</span></div>
+          <div class="metric"><b>68%</b><span>positive signal</span></div>
+          <div class="metric"><b>29%</b><span>supervote rate</span></div>
+        </div>
+        <div class="dashboard-grid">
+          <div>
+            <div class="insight"><b>AI insight:</b> Supervotes identify purchase-intent concepts better than ordinary likes.</div>
+            <div class="insight"><b>Segment:</b> Founders prefer fast swipe validation. Product managers prefer reason confirmation.</div>
+            <div class="insight"><b>Suggestion:</b> Use comparison cards when choosing between two product directions.</div>
+          </div>
+          <div>
+            <div class="bar-card">
+              <div class="bar-label"><span>AI Onboarding Copilot</span><span>81% match</span></div>
+              <div class="bar"><div class="fill" style="width: 81%"></div></div>
+            </div>
+            <div class="bar-card">
+              <div class="bar-label"><span>Supervote Pricing Signal</span><span>86% match</span></div>
+              <div class="bar"><div class="fill" style="width: 86%; background: var(--accent)"></div></div>
+            </div>
+            <div class="bar-card">
+              <div class="bar-label"><span>Fast Swipe Test vs Structured Survey</span><span>A wins 71%</span></div>
+              <div class="bar"><div class="fill" style="width: 71%; background: var(--green)"></div></div>
+            </div>
+            <div class="bar-card">
+              <div class="bar-label"><span>Persona Recap Card</span><span>64% match</span></div>
+              <div class="bar"><div class="fill" style="width: 64%; background: var(--blue)"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        Demo URL for the project submission. No API key required.
+      </footer>
+    </main>
+
+    <script>
+      const concepts = [
+        {
+          tag: "Activation",
+          title: "AI Onboarding Copilot",
+          text: "Interview new users, detect missing context, and turn answers into a usable product profile.",
+          reasons: ["Reduces setup friction", "Feels immediately useful", "Clearer value"]
+        },
+        {
+          tag: "Preference",
+          title: "Supervote Pricing Signal",
+          text: "Let users spend one scarce star on the concept they would actually prioritize, not just casually like.",
+          reasons: ["Shows real priority", "Worth paying for", "Better than survey ratings"]
+        },
+        {
+          tag: "Comparison",
+          title: "Fast Swipe Test vs Structured Survey",
+          text: "Drag-style preference testing reveals which research flow users actually want to complete.",
+          reasons: ["Faster to complete", "Less survey fatigue", "Feels more natural"]
+        }
+      ];
+
+      let index = 0;
+      let stars = 1;
+      const title = document.getElementById("cardTitle");
+      const text = document.getElementById("cardText");
+      const tag = document.getElementById("cardTag");
+      const hint = document.getElementById("signalHint");
+      const reasons = document.getElementById("reasons");
+      const reasonPanel = document.getElementById("reasonPanel");
+      const persona = document.getElementById("persona");
+      const starsLeft = document.getElementById("starsLeft");
+      const respondent = document.getElementById("respondentView");
+      const researcher = document.getElementById("researcherView");
+      const navButtons = document.querySelectorAll(".nav-btn");
+
+      function renderCard() {
+        const card = concepts[index];
+        title.textContent = card.title;
+        text.textContent = card.text;
+        tag.textContent = card.tag;
+        hint.textContent = "Waiting for reaction";
+        reasonPanel.classList.remove("show");
+        persona.classList.remove("show");
+      }
+
+      function showReasons(choice) {
+        const card = concepts[index];
+        hint.textContent = choice === "supervote" ? "Strong preference captured" : choice === "like" ? "Positive signal captured" : "Pass signal captured";
+        reasons.innerHTML = "";
+        card.reasons.forEach((reason) => {
+          const pill = document.createElement("button");
+          pill.className = "reason";
+          pill.textContent = reason;
+          pill.onclick = () => {
+            pill.style.background = "#111";
+            pill.style.color = "#fff";
+            nextCard();
+          };
+          reasons.appendChild(pill);
+        });
+        reasonPanel.classList.add("show");
+      }
+
+      function nextCard() {
+        index += 1;
+        if (index >= concepts.length) {
+          reasonPanel.classList.remove("show");
+          persona.classList.add("show");
+          hint.textContent = "Persona card generated";
+          return;
+        }
+        renderCard();
+      }
+
+      document.querySelectorAll(".choice").forEach((button) => {
+        button.addEventListener("click", () => {
+          const choice = button.dataset.choice;
+          if (choice === "supervote") {
+            if (stars === 0) return;
+            stars = 0;
+            starsLeft.textContent = "0";
+          }
+          showReasons(choice);
+        });
+      });
+
+      function setView(view) {
+        const isResearcher = view === "researcher";
+        respondent.style.display = isResearcher ? "none" : "grid";
+        researcher.classList.toggle("show", isResearcher);
+        navButtons.forEach((button) => button.classList.toggle("active", button.dataset.view === view));
+      }
+
+      navButtons.forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
+      document.getElementById("showResearcher").addEventListener("click", () => setView("researcher"));
+      document.getElementById("startDemo").addEventListener("click", () => {
+        index = 0;
+        stars = 1;
+        starsLeft.textContent = "1";
+        renderCard();
+        document.querySelector(".phone").scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+
+      renderCard();
+    </script>
+  </body>
+</html>
