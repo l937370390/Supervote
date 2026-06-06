@@ -2,6 +2,14 @@
 
 **Turn product reactions into research signals.**
 
+## Demo
+
+Primary demo page:
+
+https://l937370390.github.io/Supervote/
+
+If the submitted Vercel URL points to an unrelated project, please use the GitHub Pages demo above. This repository contains the actual Supervote submission code and standalone demo page under `docs/index.html`.
+
 Supervote is a mobile-first AI feedback testing tool for founders, product managers, and researchers. It helps teams validate product concepts, features, copy, and user preferences through fast swipe interactions, Supervote signals, AI-assisted follow-up prompts, respondent persona cards, and researcher insight dashboards.
 
 ## Core Features
